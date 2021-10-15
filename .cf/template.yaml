@@ -184,7 +184,7 @@ Resources:
         Location: !Sub "${SourceBucketName}/package.zip"
         BuildSpec:
           "version: 0.2\n\nphases:\n  pre_build:\n    commands:\n      - make
-          -v\n      - pip3 install nose2\n      - npm install serverless -g\n      - ls -al\n
+          -v\n      - npm install serverless -g\n      - ls -al\n
           \ build:\n    commands:\n      - time make all\n      #post_build:\n
           \   #commands:\n      # - command\n"
         InsecureSsl: false

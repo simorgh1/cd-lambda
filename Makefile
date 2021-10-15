@@ -1,7 +1,7 @@
 SOURCE := "sample-app-source"
 
-.PHONY: build upload test deploy
-all: build test
+.PHONY: build upload deploy
+all: build
 
 build:
 		${INFO} "Building sample-app package ..."

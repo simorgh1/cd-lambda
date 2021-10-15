@@ -1,0 +1,217 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Continuous deployment template creating required infrastructure for app codepipeline
+
+Parameters:
+  SourceBucketName:
+    Description: Name of the S3 bucket used as source for CodePipeline
+    Type: String
+    Default: "sample-app-source"
+  PipelineName:
+    Description: Name of CodePipeline pipeline for app lambda
+    Type: String
+    Default: "sample-app"
+  ProjectName:
+    Description: Name of CodeBuild project for app lambda
+    Type: String
+    Default: "sample-app"
+  ArtifactsBucketName:
+    Description: Name of S3 bucket containg codepipeline artifacts
+    Type: String
+    Default: "codepipeline-app-artifacts"
+
+Resources:
+  SourceBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref SourceBucketName
+      VersioningConfiguration:
+        Status: Enabled
+
+  ArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref ArtifactsBucketName
+
+  CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /service-role/
+      Description: "Allows CodePipeline to start CodeBuild project"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+      Policies:
+        - PolicyName: CodePipelineServiceRole
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - codebuild:BatchGetBuilds
+                  - codebuild:StartBuild
+                  - codebuild:BatchGetBuildBatches
+                  - codebuild:StartBuildBatch
+                Effect: Allow
+                Resource: "*"
+              - Action:
+                  - s3:*
+                Effect: Allow
+                Resource: "*"
+
+  CodeBuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /service-role/
+      Description: "Allows CodeBuild to run Cloudformation stacks for Image Builder"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/IAMFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+        - arn:aws:iam::aws:policy/AWSImageBuilderFullAccess
+      Policies:
+        - PolicyName: CodeBuildBaseJenkinsAgentPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Resource:
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}"
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}:*"
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+              - Effect: Allow
+                Resource:
+                  - !Sub "arn:aws:s3:::codepipeline-${AWS::Region}-*"
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:GetBucketAcl
+                  - s3:GetBucketLocation
+              - Effect: Allow
+                Action:
+                  - codebuild:CreateReportGroup
+                  - codebuild:CreateReport
+                  - codebuild:UpdateReport
+                  - codebuild:BatchPutTestCases
+                  - codebuild:BatchPutCodeCoverages
+                Resource:
+                  - !Sub "arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:report-group/${ProjectName}-*"
+        - PolicyName: CodeBuildReadOnlyJenkinsAgentPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                Resource:
+                  - !Join ["", [!GetAtt SourceBucket.Arn, "/package.zip/*"]]
+                  - !Join ["", [!GetAtt SourceBucket.Arn, "/package.zip"]]
+              - Effect: Allow
+                Resource:
+                  - !GetAtt SourceBucket.Arn
+                Action:
+                  - s3:ListBucket
+                  - s3:GetBucketAcl
+                  - s3:GetBucketLocation
+
+  appPipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Ref PipelineName
+      ArtifactStore:
+        Location: !Sub "${ArtifactBucket}"
+        Type: S3
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: S3Source
+              ActionTypeId:
+                Category: Source
+                Provider: S3
+                Owner: AWS
+                Version: "1"
+              Configuration:
+                PollForSourceChanges: "true"
+                S3Bucket: !Ref SourceBucket
+                S3ObjectKey: package.zip
+              InputArtifacts: []
+              Namespace: SourceVariables
+              OutputArtifacts:
+                - Name: SourceArtifact
+              Region: !Sub "${AWS::Region}"
+              RunOrder: 1
+        - Name: Build
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Provider: CodeBuild
+                Owner: AWS
+                Version: "1"
+              Configuration:
+                ProjectName: !Ref appProject
+              InputArtifacts:
+                - Name: SourceArtifact
+              Namespace: BuildVariables
+              OutputArtifacts:
+                - Name: BuildArtifact
+              Region: !Sub "${AWS::Region}"
+              RunOrder: 1
+
+  appProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Ref ProjectName
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      Source:
+        Type: S3
+        Location: !Sub "${SourceBucketName}/package.zip"
+        BuildSpec:
+          "version: 0.2\n\nphases:\n  pre_build:\n    commands:\n      - make
+          -v\n      - pip3 install nose2\n      - npm install serverless -g\n      - ls -al\n
+          \ build:\n    commands:\n      - time make all\n      #post_build:\n
+          \   #commands:\n      # - command\n"
+        InsecureSsl: false
+      Artifacts:
+        Type: NO_ARTIFACTS
+      BadgeEnabled: false
+      Cache:
+        Type: NO_CACHE
+      Description: Creates app pipeline using CloudFormation templates
+      EncryptionKey: !Sub "arn:aws:kms:eu-central-1:${AWS::AccountId}:alias/aws/s3"
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        EnvironmentVariables: []
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+        ImagePullCredentialsType: CODEBUILD
+        PrivilegedMode: false
+        Type: LINUX_CONTAINER
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+      ConcurrentBuildLimit: 1
+      TimeoutInMinutes: 120
+
+Outputs:
+  CodePipeline:
+    Description: "Sample app CodePipeline name"
+    Value: !Ref appPipeline
+  Project:
+    Description: "app CodeBuild Project arn"
+    Value: !GetAtt appProject.Arn

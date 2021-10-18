@@ -37,8 +37,8 @@ IaC is located in .cf folder, where a cloudformation template describing the req
 .cf/: make create
 ```
 
-There are also update and remove targets defined for upcomming updates in the pipeline or for cleaning up the created resources at the end.
+There are also update and remove targets defined for upcomming updates in the pipeline or for cleaning up of the created resources at the end.
 
-For triggering the pipeline, switch to app folder, which is a hello-world lambda function writen in python3 using serverless framework. Then run the upload command, which will copy all required artifacts to the defined s3 source bucket, this will then trigger the pipeline that deploys the lambda function.
+For triggering the pipeline, switch to the app folder, which is a hello-world lambda function writen in python3 using serverless framework. Then run the upload command, which will copy all required artifacts to the defined s3 source bucket, this will then trigger the pipeline that deploys the lambda function.
 
 For testing, hello function is invoked after deployment and the corresponding logs are printed.

@@ -5,7 +5,7 @@ Parameters:
   SourceBucketName:
     Description: Name of the S3 bucket used as source for CodePipeline
     Type: String
-    Default: "sample-app-source"
+    Default: "sample-app-s3-source"
   PipelineName:
     Description: Name of CodePipeline pipeline for app lambda
     Type: String
@@ -65,7 +65,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       Path: /service-role/
-      Description: "Allows CodeBuild to run Cloudformation stacks for Image Builder"
+      Description: "Allows CodeBuild to run Cloudformation stacks for AWS Lambda"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -78,9 +78,8 @@ Resources:
         - arn:aws:iam::aws:policy/IAMFullAccess
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
         - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
-        - arn:aws:iam::aws:policy/AWSImageBuilderFullAccess
       Policies:
-        - PolicyName: CodeBuildBaseJenkinsAgentPolicy
+        - PolicyName: CodeBuildBaseSampleAppPolicy
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -88,10 +87,14 @@ Resources:
                 Resource:
                   - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}"
                   - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}:*"
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ProjectName}*"
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ProjectName}*:*"
                 Action:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
+                  - logs:DescribeLogStreams
+                  - logs:FilterLogEvents
               - Effect: Allow
                 Resource:
                   - !Sub "arn:aws:s3:::codepipeline-${AWS::Region}-*"
@@ -110,7 +113,12 @@ Resources:
                   - codebuild:BatchPutCodeCoverages
                 Resource:
                   - !Sub "arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:report-group/${ProjectName}-*"
-        - PolicyName: CodeBuildReadOnlyJenkinsAgentPolicy
+              - Effect: Allow
+                Resource:
+                  - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${ProjectName}*"
+                Action:
+                  - lambda:*
+        - PolicyName: CodeBuildReadOnlySampleAppPolicy
           PolicyDocument:
             Version: 2012-10-17
             Statement:
@@ -185,7 +193,7 @@ Resources:
         BuildSpec:
           "version: 0.2\n\nphases:\n  pre_build:\n    commands:\n      - make
           -v\n      - npm install serverless -g\n      - ls -al\n
-          \ build:\n    commands:\n      - time make all\n      #post_build:\n
+          \ build:\n    commands:\n      - time make deploy\n      - time make test\n  #post_build:\n
           \   #commands:\n      # - command\n"
         InsecureSsl: false
       Artifacts:
@@ -194,7 +202,7 @@ Resources:
       Cache:
         Type: NO_CACHE
       Description: Creates app pipeline using CloudFormation templates
-      EncryptionKey: !Sub "arn:aws:kms:eu-central-1:${AWS::AccountId}:alias/aws/s3"
+      EncryptionKey: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/s3"
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         EnvironmentVariables: []

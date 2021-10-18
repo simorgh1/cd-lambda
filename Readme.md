@@ -12,7 +12,7 @@ CodePipeline CI/CD template and build script for a sample aws lambda application
 
 ### Working in Dev Container
 
-Sample lambda application was created by serverless framework and python3. CodePipeline is a managed aws service and the provided infrastructure as code cloudformation templates is applied using aws cli.
+Sample lambda application was created by [serverless framework](https://www.serverless.com) and python3. CodePipeline is a managed aws service and the provided infrastructure as code cloudformation templates is applied using aws cli.
 This tools are aleady pre-installed in the [development container](https://microsoft.github.io/code-with-engineering-playbook/developer-experience/devcontainers/), which could be used in vscode.
 
 ### Requirments
@@ -30,3 +30,15 @@ After cloning this repository, open the folder in vscode, it will propmpt you to
 ![Workflow](ci-cd-lambda.png)
 
 After [configuring](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) the aws cli with the valid credentials, create the ci/cd pipeline.
+
+IaC is located in .cf folder, where a cloudformation template describing the required resources for building the pipeline is stored. A Makefile, simlyfies the build process here as well, open a terminal in this folder and run:
+
+```bash
+.cf/: make create
+```
+
+There are also update and remove targets defined for upcomming updates in the pipeline or for cleaning up the created resources at the end.
+
+For triggering the pipeline, switch to app folder, which is a hello-world lambda function writen in python3 using serverless framework. Then run the upload command, which will copy all required artifacts to the defined s3 source bucket, this will then trigger the pipeline that deploys the lambda function.
+
+For testing, hello function is invoked after deployment and the corresponding logs are printed.

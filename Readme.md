@@ -1,12 +1,12 @@
 # CI/CD for aws lambda
 
-![Visits Badge](https://badges.pufler.dev/visits/simorgh1/cd-lambda)
-[![GitHub license](https://img.shields.io/github/license/simorgh1/cd-lambda)](https://github.com/simorgh1/cd-lambda/blob/master/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/simorgh1/cd-lambda)](https://github.com/simorgh1/cd-lambda/stargazers)
+![Visits Badge](https://badges.pufler.dev/visits/simorgh1/lambda-cd)
+[![GitHub license](https://img.shields.io/github/license/simorgh1/lambda-cd)](https://github.com/simorgh1/lambda-cd/blob/master/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/simorgh1/lambda-cd)](https://github.com/simorgh1/lambda-cd/stargazers)
 ![Twitter Follow](https://img.shields.io/twitter/follow/bahrammaravandi?style=social)
 ![LinkedIn Follow](https://shields.io/badge/style-bahram.maravandi-black?logo=linkedin&label=LinkedIn&link=https://www.linkedin.com/in/bahram.maravandi)
 
-Stargaze ![GitHub Repo stars](https://img.shields.io/github/stars/simorgh1/cd-lambda?style=social) if you find it useful.
+Stargaze ![GitHub Repo stars](https://img.shields.io/github/stars/simorgh1/lambda-cd?style=social) if you find it useful.
 
 CodePipeline CI/CD template and build script for a sample aws lambda application.
 

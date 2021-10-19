@@ -7,8 +7,13 @@ LABEL authors="Bahram Maravandi"
 
 #### Install required tools
 
-RUN apt-get update -y && export DEBIAN_FRONTEND=noninteractive && \
-    apt-get -y install --no-install-recommends python3 zip make python3-pip
+RUN apt-get update -y && \
+    export DEBIAN_FRONTEND=noninteractive && \
+    apt-get -y install --no-install-recommends \
+    python3 \
+    zip \
+    make \
+    python3-pip
 
 ### Install awscliv2 for arm, for x86 read: https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html#cliv2-linux-install
 

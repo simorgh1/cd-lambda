@@ -15,7 +15,7 @@ Parameters:
     Type: String
     Default: "sample-app"
   ArtifactsBucketName:
-    Description: Name of S3 bucket containg codepipeline artifacts
+    Description: Name of S3 bucket containing codepipeline artifacts
     Type: String
     Default: "codepipeline-app-artifacts"
 
@@ -201,7 +201,7 @@ Resources:
       BadgeEnabled: false
       Cache:
         Type: NO_CACHE
-      Description: Creates app pipeline using CloudFormation templates
+      Description: Creates sample app pipeline using CloudFormation templates
       EncryptionKey: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/s3"
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL

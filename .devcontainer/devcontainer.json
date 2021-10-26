@@ -9,6 +9,9 @@
     // Use the -bullseye variants if you are on a M1 mac.
     "args": { "VARIANT": "16-bullseye" }
   },
+  
+  // mount aws credentials into devcontainer
+  "runArgs": ["-v", "${localEnv:HOME}/.aws:/home/node/.aws:ro"],
 
   // Set *default* container specific settings.json values on container create.
   "settings": {},

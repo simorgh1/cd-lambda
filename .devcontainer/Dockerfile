@@ -13,7 +13,8 @@ RUN apt-get update -y && \
     python3 \
     zip \
     make \
-    python3-pip
+    python3-pip && \
+    pip3 install shyaml
 
 ### Install awscliv2 for arm, for x86 read: https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html#cliv2-linux-install
 

@@ -1,4 +1,4 @@
-SOURCE := "sample-app-s3-source"
+SOURCE := $$(cat ../.cf/template.yaml | shyaml get-value Parameters.SourceBucketName.Default)
 
 .PHONY: upload deploy test remove
 all: deploy test

@@ -29,7 +29,7 @@ This tools are already pre-installed in the [development container](https://micr
 
 ### Getting started
 
-[Configur](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) aws cli with valid credentials and create your default profile. After startup, it will be available for the the devcontainer user.
+[Configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) aws cli with valid credentials and create your default profile. After startup, it will be available for the the Dev Container user.
 
 
 After cloning this repository, open the folder in vscode, it will prompt you to open it inside the configured Dev Container. First startup will take a little longer since the docker container image needs to be built, then inside the vscode, open a terminal in the project working folder.

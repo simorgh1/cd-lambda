@@ -13,6 +13,7 @@ RUN apt-get update -y && \
     python3 \
     zip \
     make \
+    xdg-utils \
     python3-pip && \
     pip3 install shyaml cfn-lint
 

@@ -31,7 +31,6 @@ This tools are already pre-installed in the [development container](https://micr
 
 [Configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html) aws cli with valid credentials and create your default profile. After startup, it will be available for the the Dev Container user.
 
-
 After cloning this repository, open the folder in vscode, it will prompt you to open it inside the configured Dev Container. First startup will take a little longer since the docker container image needs to be built, then inside the vscode, open a terminal in the project working folder.
 
 ### CI/CD Workflow
@@ -75,6 +74,32 @@ Lambda application also required some resources, which needs to be cleanup at th
 ```bash
 app/: make remove
 ```
+
+### CloudFormation tools
+
+There are number of tools and extensions supporting CloudFormation inside this Dev Container that I will describe in this section:
+
+#### Documentation lookup
+
+Working with CloudFormation templates requires knowledge about writing yaml and keeping the correct indentation. In addition one should know how to declare aws resource types.
+
+##### Indentation support
+
+There are two extensions defined in the Dev Container for supporting indentation, one is Indenticator, which will keep an eye on the indentations in your templates and the other extension is indent-rainbow, which shows your template's indents with different colors. For more information go to Extension (shift+cmd+x).
+
+#### AWS Resource lookup
+
+Open the template and just hover over any resource type, a small tooltip with the link to the related aws doc will be shown, just click on it and you will be redirected in your browser to that aws documentation page.
+
+If you want to read the aws resource list, open Command Palette (shift+cmd+p), select Tasks: Run Task, then select _CF Resource List_, then _AWS resource and property types reference_ will be opened in your browser.
+
+Select _CF Command Reference_ and it will open command reference page for aws cli cloudformation.
+
+Select a Resource Type for example _AWS::S3::Bucket_ then go to Tasks and select _CF Type Search_ and it will search cloudformation documentation for the selected resource type.
+
+#### Linter
+
+Perhaps one of the most important features is to validate the current template and this is the job of cf-lint and the related vscode extension that will validate your changes against the aws api. It helps a lot since you do not need to run the template in cloudformation task in order to receive the response, but an instant validation inside vscode after any edit.
 
 ### Feedback
 

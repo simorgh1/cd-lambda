@@ -30,7 +30,8 @@
 	"amazonwebservices.aws-toolkit-vscode",
 	"oderwat.indent-rainbow",
 	"sirtori.indenticator",
-	"kddejong.vscode-cfn-lint"
+	"kddejong.vscode-cfn-lint",
+	"actboy168.tasks"
 ],
 
   "remoteUser": "node"

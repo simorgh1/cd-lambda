@@ -83,9 +83,9 @@ There are number of tools and extensions supporting CloudFormation inside this D
 
 Working with CloudFormation templates requires knowledge about writing yaml and keeping the correct indentation. In addition one should know how to declare aws resource types.
 
-##### Indentation support
+#### Indentation support
 
-There are two extensions defined in the Dev Container for supporting indentation, one is Indenticator, which will keep an eye on the indentations in your templates and the other extension is indent-rainbow, which shows your template's indents with different colors. For more information go to Extension (shift+cmd+x).
+There are two extensions defined in the Dev Container for supporting indentation, one is Indenticator, which will keep an eye on the indentations in your templates and the other extension is indent-rainbow, which shows your template's indents with different colors. For more information open Extensions sidebar (shift+cmd+x).
 
 #### AWS Resource lookup
 
@@ -99,7 +99,7 @@ Select a Resource Type for example _AWS::S3::Bucket_ then go to Tasks and select
 
 #### Linter
 
-Perhaps one of the most important features is to validate the current template and this is the job of cf-lint and the related vscode extension that will validate your changes against the aws api. It helps a lot since you do not need to run the template in cloudformation task in order to receive the response, but an instant validation inside vscode after any edit.
+Perhaps one of the most important features is to validate the current template and this is the job of *cf-lint* and the related vscode extension that will validate your changes against the aws api. It helps a lot since you do not need to run the template in cloudformation stack in order to receive the response, but an instant validation inside vscode after any edit.
 
 ### Feedback
 
